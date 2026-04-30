@@ -1,0 +1,4 @@
+node_modules/
+mcms.db
+public/uploads/*
+!public/uploads/.gitkeep
