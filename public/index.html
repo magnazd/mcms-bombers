@@ -92,9 +92,9 @@
       <button class="btn btn-sm btn-outline mb-1" onclick="showSection('classes')">← Back to Classes</button>
       <div class="class-header" id="class-header"></div>
       <div class="class-tabs">
-        <button class="tab-btn active" onclick="showClassTab('assignments')">Assignments</button>
-        <button class="tab-btn" onclick="showClassTab('students')" id="tab-students">Students</button>
-        <button class="tab-btn" onclick="showClassTab('add-students')" id="tab-add-students" style="display:none">Add Students</button>
+        <button class="tab-btn active" onclick="showClassTab('assignments', this)">Assignments</button>
+        <button class="tab-btn" onclick="showClassTab('students', this)" id="tab-students">Students</button>
+        <button class="tab-btn" onclick="showClassTab('add-students', this)" id="tab-add-students" style="display:none">Add Students</button>
       </div>
       <div id="class-tab-assignments" class="class-tab">
         <button class="btn btn-primary mb-1" id="btn-create-assignment" style="display:none" onclick="showCreateAssignment()">+ Create Assignment</button>
@@ -118,10 +118,10 @@
     <div id="section-leaderboard" class="section hidden">
       <h2>🏆 Leaderboard</h2>
       <div class="filter-row">
-        <button class="filter-btn active" onclick="loadLeaderboard('')">All Grades</button>
-        <button class="filter-btn" onclick="loadLeaderboard(6)">6th Grade</button>
-        <button class="filter-btn" onclick="loadLeaderboard(7)">7th Grade</button>
-        <button class="filter-btn" onclick="loadLeaderboard(8)">8th Grade</button>
+        <button class="filter-btn active" onclick="loadLeaderboard('', this)">All Grades</button>
+        <button class="filter-btn" onclick="loadLeaderboard(6, this)">6th Grade</button>
+        <button class="filter-btn" onclick="loadLeaderboard(7, this)">7th Grade</button>
+        <button class="filter-btn" onclick="loadLeaderboard(8, this)">8th Grade</button>
       </div>
       <div id="leaderboard-list" class="leaderboard-list"></div>
     </div>
@@ -141,7 +141,7 @@
       <div id="comments-list"></div>
     </div>
 
-    <!-- Users Section (Principal) -->
+    <!-- Users Section -->
     <div id="section-users" class="section hidden">
       <h2>All Users</h2>
       <div id="users-list"></div>
