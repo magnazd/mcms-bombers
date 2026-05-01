@@ -110,24 +110,13 @@ const DB = {
     const users = this.getUsers();
     const user = users.find(u => u.id === studentId);
     if (user) { user.total_points += points; this.saveUsers(users); }
-    // Check if all assignments done → unlock games
+    // Games require explicit teacher/principal approval — no auto-unlock
     this.checkGamesUnlock(studentId);
     return { score, points, correct, total: assignment.questions.length };
   },
 
   checkGamesUnlock(studentId) {
-    const myClasses = this.getClassesForStudent(studentId);
-    const allAssignments = myClasses.flatMap(c => this.getAssignmentsForClass(c.id));
-    const subs = this.getSubmissions().filter(s => s.student_id === studentId);
-    const allDone = allAssignments.every(a => subs.find(s => s.assignment_id === a.id));
-    if (allDone && allAssignments.length > 0) {
-      const users = this.getUsers();
-      const user = users.find(u => u.id === studentId);
-      if (user && user.games_allowed === 'pending') {
-        user.games_allowed = 'all';
-        this.saveUsers(users);
-      }
-    }
+    // Intentionally empty — games only unlock via staff approval
   },
 
   getSubmission(assignmentId, studentId) { return this.getSubmissions().find(s => s.assignment_id === assignmentId && s.student_id === studentId); },
@@ -790,14 +779,11 @@ function removeStudent(classId, studentId) { if (!confirm('Remove student?')) re
 const GAMES = [
   { id: 1, name: 'Math Playground', desc: 'Practice math skills', icon: '📐', type: 'educational', url: 'https://www.mathplayground.com/games.html' },
   { id: 2, name: 'Typing Club', desc: 'Improve your typing speed', icon: '⌨️', type: 'educational', url: 'https://www.typingclub.com' },
-  { id: 3, name: 'GeoGuessr', desc: 'Explore world geography', icon: '🌍', type: 'educational', url: 'https://www.geoguessr.com' },
   { id: 4, name: 'Scratch', desc: 'Learn coding by making games', icon: '🐱', type: 'educational', url: 'https://scratch.mit.edu' },
   { id: 5, name: 'Cool Math Games', desc: 'Fun math-based games', icon: '🎮', type: 'fun', url: 'https://www.coolmathgames.com' },
   { id: 6, name: 'Prodigy Math', desc: 'Math adventure game', icon: '⚔️', type: 'educational', url: 'https://www.prodigygame.com' },
   { id: 7, name: 'Kahoot!', desc: 'Quiz game platform', icon: '❓', type: 'educational', url: 'https://kahoot.it' },
   { id: 8, name: 'Quizlet', desc: 'Study with flashcards', icon: '🃏', type: 'educational', url: 'https://quizlet.com' },
-  { id: 9, name: 'Poki Games', desc: 'Fun browser games', icon: '🕹️', type: 'fun', url: 'https://poki.com' },
-  { id: 10, name: 'Chess.com', desc: 'Play chess online', icon: '♟️', type: 'fun', url: 'https://www.chess.com/play/computer' },
 ];
 
 let currentGameFilter = 'all';
