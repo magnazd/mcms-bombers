@@ -7,158 +7,224 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <!-- POPUP NOTIFICATION OVERLAY -->
-  <div id="popup-overlay" class="popup-overlay hidden">
-    <div class="popup-box">
-      <div class="popup-header">📢 Message from <span id="popup-from"></span></div>
-      <div id="popup-message" class="popup-message"></div>
-      <button onclick="dismissPopup()" class="btn btn-primary">OK</button>
+
+<!-- POPUP NOTIFICATION -->
+<div id="popup-overlay" class="popup-overlay hidden">
+  <div class="popup-box">
+    <div class="popup-header">📢 Message from <span id="popup-from"></span></div>
+    <div id="popup-message" class="popup-message"></div>
+    <button onclick="dismissPopup()" class="btn btn-primary">OK</button>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div id="page-landing" class="page">
+  <div class="landing-container">
+    <div class="landing-logo">
+      <div class="bomber-icon">🏈</div>
+      <h1 class="landing-title">MCMS BOMBERS</h1>
+      <p class="landing-subtitle">Midwest City Middle School</p>
     </div>
+    <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+      <input type="text" id="login-username" placeholder="Username" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit" class="btn btn-primary btn-full">Login</button>
+      <div id="login-error" class="error-msg"></div>
+      <p style="text-align:center;color:var(--text-light);font-size:13px;margin-top:8px;">Ask your teacher or principal to create your account.</p>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page hidden">
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div id="announcement-bar" class="hidden">
+    <span class="ann-icon">📣</span>
+    <div class="ann-content" id="ann-content"></div>
+    <button class="ann-dismiss" id="ann-dismiss-btn" style="display:none" onclick="dismissAnnouncement()">Remove</button>
   </div>
 
-  <!-- LANDING / LOGIN -->
-  <div id="page-landing" class="page">
-    <div class="landing-container">
-      <div class="landing-logo">
-        <div class="bomber-icon">🏈</div>
-        <h1 class="landing-title">MCMS BOMBERS</h1>
-        <p class="landing-subtitle">Midwest City Middle School</p>
-      </div>
-      <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
-        <input type="text" id="login-username" placeholder="Username" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button type="submit" class="btn btn-primary btn-full">Login</button>
-        <div id="login-error" class="error-msg"></div>
-        <p style="text-align:center;color:var(--text-light);font-size:13px;margin-top:8px;">Ask your teacher or principal to create your account.</p>
-      </form>
+  <nav class="navbar">
+    <div class="nav-left">
+      <span class="nav-logo">🏈 MCMS BOMBERS</span>
     </div>
-  </div>
+    <div class="nav-center">
+      <button class="nav-btn active" data-page="dashboard" onclick="showSection('dashboard')">Dashboard</button>
+      <button class="nav-btn" data-page="classes" onclick="showSection('classes')">Classes</button>
+      <button class="nav-btn" data-page="games" onclick="showSection('games')">Games</button>
+      <button class="nav-btn" data-page="meetings" onclick="showSection('meetings')">Meetings</button>
+      <button class="nav-btn" data-page="leaderboard" onclick="showSection('leaderboard')">Leaderboard</button>
+      <button class="nav-btn" data-page="comments" onclick="showSection('comments')">
+        Messages <span id="msg-badge" class="badge hidden">0</span>
+      </button>
+      <button class="nav-btn" data-page="users" onclick="showSection('users')" id="nav-users" style="display:none">All Users</button>
+      <button class="nav-btn" data-page="monitor" onclick="showSection('monitor')" id="nav-monitor" style="display:none">Monitor</button>
+      <button class="nav-btn" id="nav-create-account" style="display:none" onclick="showCreateAccount()">+ Account</button>
+      <button class="nav-btn" data-page="announcements" onclick="showSection('announcements')" id="nav-announcements" style="display:none">Announcements</button>
+    </div>
+    <div class="nav-right">
+      <div id="nav-avatar" class="avatar-display" onclick="showAvatarBuilder()" title="Edit Avatar" style="cursor:pointer">😊</div>
+      <span id="user-info" class="user-info"></span>
+      <button class="btn btn-sm btn-outline" onclick="handleLogout()">Logout</button>
+    </div>
+  </nav>
 
-  <!-- DASHBOARD -->
-  <div id="page-dashboard" class="page hidden">
-    <nav class="navbar">
-      <div class="nav-left">
-        <span class="nav-logo">🏈 MCMS BOMBERS</span>
-      </div>
-      <div class="nav-center">
-        <button class="nav-btn active" data-page="dashboard" onclick="showSection('dashboard')">Dashboard</button>
-        <button class="nav-btn" data-page="classes" onclick="showSection('classes')">Classes</button>
-        <button class="nav-btn" data-page="leaderboard" onclick="showSection('leaderboard')">Leaderboard</button>
-        <button class="nav-btn" data-page="comments" onclick="showSection('comments')">
-          Messages <span id="msg-badge" class="badge hidden">0</span>
-        </button>
-        <button class="nav-btn" data-page="users" onclick="showSection('users')" id="nav-users" style="display:none">All Users</button>
-        <button class="nav-btn" id="nav-create-account" style="display:none" onclick="showCreateAccount()">+ Create Account</button>
-      </div>
-      <div class="nav-right">
-        <span id="user-info" class="user-info"></span>
-        <button class="btn btn-sm btn-outline" onclick="handleLogout()">Logout</button>
-      </div>
-    </nav>
-
-    <!-- Dashboard Section -->
-    <div id="section-dashboard" class="section">
-      <div class="welcome-banner">
+  <!-- Dashboard -->
+  <div id="section-dashboard" class="section">
+    <div class="welcome-banner">
+      <div>
         <h2>Welcome, <span id="welcome-name"></span>!</h2>
-        <div class="role-badge" id="role-badge"></div>
+        <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="grade-display"></p>
       </div>
-      <div id="student-stats" class="stats-row hidden">
-        <div class="stat-card">
-          <div class="stat-number" id="stat-points">0</div>
-          <div class="stat-label">Total Points</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-classes">0</div>
-          <div class="stat-label">My Classes</div>
-        </div>
+      <div class="role-badge" id="role-badge"></div>
+    </div>
+    <div id="student-stats" class="stats-row hidden">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-points">0</div>
+        <div class="stat-label">Total Points</div>
       </div>
-      <div id="student-grades" class="hidden">
-        <h3>My Grades</h3>
-        <div id="grades-list" class="grades-grid"></div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-classes">0</div>
+        <div class="stat-label">My Classes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-assignments">0</div>
+        <div class="stat-label">Assignments Done</div>
       </div>
     </div>
-
-    <!-- Classes Section -->
-    <div id="section-classes" class="section hidden">
-      <div class="section-header">
-        <h2>My Classes</h2>
-        <button class="btn btn-primary" id="btn-create-class" style="display:none" onclick="showCreateClass()">+ Create Class</button>
-      </div>
-      <div id="classes-grid" class="classes-grid"></div>
+    <div id="student-grades" class="hidden">
+      <h3>My Grades</h3>
+      <div id="grades-list" class="grades-grid"></div>
     </div>
+  </div>
 
-    <!-- Class Detail -->
-    <div id="section-class-detail" class="section hidden">
-      <button class="btn btn-sm btn-outline mb-1" onclick="showSection('classes')">← Back to Classes</button>
-      <div class="class-header" id="class-header"></div>
-      <div class="class-tabs">
-        <button class="tab-btn active" onclick="showClassTab('assignments', this)">Assignments</button>
-        <button class="tab-btn" onclick="showClassTab('students', this)" id="tab-students">Students</button>
-        <button class="tab-btn" onclick="showClassTab('add-students', this)" id="tab-add-students" style="display:none">Add Students</button>
-      </div>
-      <div id="class-tab-assignments" class="class-tab">
-        <button class="btn btn-primary mb-1" id="btn-create-assignment" style="display:none" onclick="showCreateAssignment()">+ Create Assignment</button>
-        <div id="assignments-list"></div>
-      </div>
-      <div id="class-tab-students" class="class-tab hidden">
-        <div id="class-students-list"></div>
-      </div>
-      <div id="class-tab-add-students" class="class-tab hidden">
-        <div id="available-students-list"></div>
+  <!-- Classes -->
+  <div id="section-classes" class="section hidden">
+    <div class="section-header">
+      <h2>My Classes</h2>
+      <button class="btn btn-primary" id="btn-create-class" style="display:none" onclick="showCreateClass()">+ Create Class</button>
+    </div>
+    <div id="classes-grid" class="classes-grid"></div>
+  </div>
+
+  <!-- Class Detail -->
+  <div id="section-class-detail" class="section hidden">
+    <button class="btn btn-sm btn-outline mb-1" onclick="showSection('classes')">← Back</button>
+    <div class="class-header" id="class-header"></div>
+    <div class="class-tabs">
+      <button class="tab-btn active" onclick="showClassTab('assignments',this)">Assignments</button>
+      <button class="tab-btn" onclick="showClassTab('students',this)">Students</button>
+      <button class="tab-btn" onclick="showClassTab('add-students',this)" id="tab-add-students" style="display:none">Add Students</button>
+    </div>
+    <div id="class-tab-assignments" class="class-tab">
+      <button class="btn btn-primary mb-1" id="btn-create-assignment" style="display:none" onclick="showCreateAssignment()">+ Assignment</button>
+      <div id="assignments-list"></div>
+    </div>
+    <div id="class-tab-students" class="class-tab hidden"><div id="class-students-list"></div></div>
+    <div id="class-tab-add-students" class="class-tab hidden"><div id="available-students-list"></div></div>
+  </div>
+
+  <!-- Assignment Detail -->
+  <div id="section-assignment" class="section hidden">
+    <button class="btn btn-sm btn-outline mb-1" onclick="backToClassDetail()">← Back</button>
+    <div id="assignment-content"></div>
+  </div>
+
+  <!-- Games -->
+  <div id="section-games" class="section hidden">
+    <div class="section-header">
+      <h2>🎮 Games</h2>
+      <div style="display:flex;gap:8px">
+        <button class="filter-btn active" onclick="filterGames('all',this)">All</button>
+        <button class="filter-btn" onclick="filterGames('educational',this)">Educational</button>
+        <button class="filter-btn" onclick="filterGames('fun',this)">Fun</button>
       </div>
     </div>
-
-    <!-- Assignment Detail -->
-    <div id="section-assignment" class="section hidden">
-      <button class="btn btn-sm btn-outline mb-1" onclick="backToClassDetail()">← Back to Class</button>
-      <div id="assignment-content"></div>
+    <div id="games-locked-msg" class="hidden" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;color:var(--text-light)">
+      🔒 Games are locked until you complete all your assignments.
     </div>
-
-    <!-- Leaderboard Section -->
-    <div id="section-leaderboard" class="section hidden">
-      <h2>🏆 Leaderboard</h2>
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="loadLeaderboard('', this)">All Grades</button>
-        <button class="filter-btn" onclick="loadLeaderboard(6, this)">6th Grade</button>
-        <button class="filter-btn" onclick="loadLeaderboard(7, this)">7th Grade</button>
-        <button class="filter-btn" onclick="loadLeaderboard(8, this)">8th Grade</button>
-      </div>
-      <div id="leaderboard-list" class="leaderboard-list"></div>
-    </div>
-
-    <!-- Comments/Messages Section -->
-    <div id="section-comments" class="section hidden">
-      <h2>Messages</h2>
-      <div id="send-comment-area" style="display:none">
-        <h3>Send a Message</h3>
-        <div class="comment-form">
-          <select id="comment-to"></select>
-          <textarea id="comment-msg" placeholder="Type your message..." rows="3"></textarea>
-          <button class="btn btn-primary" onclick="sendComment()">Send</button>
-        </div>
-      </div>
-      <h3>My Messages</h3>
-      <div id="comments-list"></div>
-    </div>
-
-    <!-- Users Section -->
-    <div id="section-users" class="section hidden">
-      <h2>All Users</h2>
-      <div id="users-list"></div>
-    </div>
-
-    <!-- MODALS -->
-    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
-      <div class="modal" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h3 id="modal-title"></h3>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
-        </div>
-        <div id="modal-body" class="modal-body"></div>
+    <div id="games-grid" class="games-grid"></div>
+    <div id="game-frame-area" class="hidden">
+      <button class="btn btn-sm btn-outline mb-1" onclick="closeGame()">← Back to Games</button>
+      <div class="game-frame-container">
+        <iframe id="game-iframe" src="" allowfullscreen></iframe>
       </div>
     </div>
   </div>
 
-  <script src="/app.js"></script>
+  <!-- Meetings -->
+  <div id="section-meetings" class="section hidden">
+    <div class="section-header">
+      <h2>📹 Meetings</h2>
+      <button class="btn btn-primary" id="btn-create-meeting" style="display:none" onclick="showCreateMeeting()">+ Host Meeting</button>
+    </div>
+    <div id="meetings-list"></div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div id="section-leaderboard" class="section hidden">
+    <h2>🏆 Leaderboard</h2>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="loadLeaderboard('',this)">All Grades</button>
+      <button class="filter-btn" onclick="loadLeaderboard(6,this)">6th Grade</button>
+      <button class="filter-btn" onclick="loadLeaderboard(7,this)">7th Grade</button>
+      <button class="filter-btn" onclick="loadLeaderboard(8,this)">8th Grade</button>
+    </div>
+    <div id="leaderboard-list" class="leaderboard-list"></div>
+  </div>
+
+  <!-- Messages -->
+  <div id="section-comments" class="section hidden">
+    <h2>Messages</h2>
+    <div id="send-comment-area" style="display:none">
+      <h3>Send a Message</h3>
+      <div class="comment-form">
+        <select id="comment-to"></select>
+        <textarea id="comment-msg" placeholder="Type your message..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendComment()">Send</button>
+      </div>
+    </div>
+    <h3>My Messages</h3>
+    <div id="comments-list"></div>
+  </div>
+
+  <!-- All Users -->
+  <div id="section-users" class="section hidden">
+    <div class="section-header">
+      <h2>All Users</h2>
+    </div>
+    <div id="users-list"></div>
+  </div>
+
+  <!-- Monitor -->
+  <div id="section-monitor" class="section hidden">
+    <h2>👁️ Student Activity Monitor</h2>
+    <p style="color:var(--text-light);margin-bottom:16px;font-size:13px">Shows what page each student is currently on.</p>
+    <div id="monitor-grid" class="monitor-grid"></div>
+  </div>
+
+  <!-- Announcements Manage -->
+  <div id="section-announcements" class="section hidden">
+    <div class="section-header">
+      <h2>📣 Announcements</h2>
+      <button class="btn btn-primary" onclick="showCreateAnnouncement()">+ New Announcement</button>
+    </div>
+    <div id="announcements-manage-list"></div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
 </body>
 </html>
