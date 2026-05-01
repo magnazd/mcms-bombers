@@ -51,6 +51,22 @@ const DB = {
     return null;
   },
 
+  deleteUser(id) {
+    // Remove user
+    this.saveUsers(this.getUsers().filter(u => u.id !== id));
+    // Remove from all classes
+    this.saveClassStudents(this.getClassStudents().filter(r => r.student_id !== id));
+    // Remove their submissions
+    this.saveSubmissions(this.getSubmissions().filter(s => s.student_id !== id));
+    // Remove their comments
+    this.saveComments(this.getComments().filter(c => c.from_id !== id && c.to_id !== id));
+    // Remove their classes if teacher
+    const teacherClasses = this.getClasses().filter(c => c.teacher_id === id).map(c => c.id);
+    this.saveClasses(this.getClasses().filter(c => c.teacher_id !== id));
+    // Remove assignments from deleted teacher's classes
+    this.saveAssignments(this.getAssignments().filter(a => !teacherClasses.includes(a.class_id)));
+  },
+
   addClass(name, subject, grade, teacherId) {
     const classes = this.getClasses();
     const cls = { id: this._nextId('classes'), name, subject, grade: parseInt(grade), teacher_id: teacherId };
@@ -1029,6 +1045,7 @@ function sendCommentTo(studentId, name) {
 function loadUsers() {
   const users = DB.getUsers();
   const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  const isPrincipal = currentUser.role === 'principal';
   const container = document.getElementById('users-list');
   const roleBgs = { principal: '#f5c400', counselor: '#333', teacher: '#444', student: '#222' };
   const roleColors = { principal: '#000', counselor: '#f5c400', teacher: '#f5c400', student: '#f5c400' };
@@ -1041,7 +1058,10 @@ function loadUsers() {
       '<td><span style="padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:' + (roleBgs[u.role]||'#333') + ';color:' + (roleColors[u.role]||'#fff') + '">' + u.role.toUpperCase() + '</span></td>' +
       '<td>' + (u.grade ? u.grade + 'th' : '-') + '</td>' +
       '<td>' + (u.total_points || 0) + '</td>' +
-      (isStaff && u.role === 'student' ? '<td><button class="btn btn-sm btn-dark" onclick="showGameSettings(' + u.id + ',\'' + esc(u.display_name) + '\')">🎮 Games</button> <button class="btn btn-sm btn-dark" onclick="promoteStudent(' + u.id + ')">⬆️ Grade</button></td>' : (isStaff ? '<td>-</td>' : '')) +
+      (isStaff ? '<td style="display:flex;gap:6px;flex-wrap:wrap">' +
+        (u.role === 'student' ? '<button class="btn btn-sm btn-dark" onclick="showGameSettings(' + u.id + ',\'' + esc(u.display_name) + '\')">🎮 Games</button> <button class="btn btn-sm btn-dark" onclick="promoteStudent(' + u.id + ')">⬆️ Grade</button> ' : '') +
+        (isPrincipal && u.id !== currentUser.id ? '<button class="btn btn-sm btn-danger" onclick="deleteAccount(' + u.id + ',\'' + esc(u.display_name) + '\')">🗑️ Delete</button>' : '') +
+        '</td>' : '') +
       '</tr>'
     ).join('') + '</tbody></table>';
 }
@@ -1056,6 +1076,13 @@ function promoteStudent(studentId) {
   if (!confirm('Promote ' + user.display_name + ' from ' + currentGrade + 'th to ' + newGrade + 'th grade?')) return;
   DB.updateUser(studentId, { grade: newGrade });
   alert(user.display_name + ' has been promoted to ' + newGrade + 'th grade!');
+  loadUsers();
+}
+
+// ===== DELETE ACCOUNT =====
+function deleteAccount(userId, displayName) {
+  if (!confirm('Delete account for "' + displayName + '"?\n\nThis will also remove them from all classes and delete their submissions. This cannot be undone.')) return;
+  DB.deleteUser(userId);
   loadUsers();
 }
 
