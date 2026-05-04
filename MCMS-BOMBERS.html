@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCMS BOMBERS</title>
+  <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #1a1a1a; --primary-light: #2d2d2d; --accent: #f5c400; --accent-light: #ffe066;
+  --bg: #111111; --card: #1e1e1e; --card2: #252525; --text: #f0f0f0; --text-light: #999999;
+  --success: #4caf50; --warning: #f5c400; --danger: #e53935; --border: #333333;
+  --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.hidden { display: none !important; }
+.landing-container { max-width: 420px; margin: 0 auto; padding: 40px 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.landing-logo { text-align: center; margin-bottom: 40px; }
+.bomber-icon { font-size: 80px; margin-bottom: 10px; animation: bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+.landing-title { font-size: 48px; font-weight: 900; color: var(--accent); letter-spacing: 4px; text-shadow: 2px 2px 0 #000; }
+.landing-subtitle { font-size: 14px; color: var(--text-light); margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form input, .auth-form select { padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 15px; background: var(--card); color: var(--text); outline: none; transition: border-color 0.2s; }
+.auth-form input:focus, .auth-form select:focus { border-color: var(--accent); }
+.error-msg { color: var(--danger); font-size: 14px; text-align: center; }
+.btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:hover { background: var(--accent-light); }
+.btn-success { background: var(--success); color: white; }
+.btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+.btn-outline:hover { background: var(--accent); color: #000; }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-full { width: 100%; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { opacity: 0.85; }
+.btn-dark { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-dark:hover { border-color: var(--accent); color: var(--accent); }
+.mb-1 { margin-bottom: 16px; }
+#announcement-bar { background: var(--accent); color: #000; padding: 10px 24px; font-weight: 600; font-size: 14px; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+#announcement-bar .ann-icon { font-size: 18px; flex-shrink: 0; }
+#announcement-bar .ann-content { flex: 1; }
+#announcement-bar .ann-content a { color: #000; font-weight: 700; }
+#announcement-bar .ann-dismiss { background: rgba(0,0,0,0.15); border: none; border-radius: 6px; padding: 3px 10px; cursor: pointer; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+.navbar { background: var(--primary); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 58px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
+.nav-logo { color: var(--accent); font-weight: 900; font-size: 18px; letter-spacing: 2px; }
+.nav-center { display: flex; gap: 2px; flex-wrap: wrap; }
+.nav-btn { background: transparent; border: none; color: var(--text-light); padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.nav-btn:hover, .nav-btn.active { color: var(--accent); background: rgba(245,196,0,0.1); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.user-info { color: var(--text-light); font-size: 13px; }
+.badge { background: var(--accent); color: #000; font-size: 11px; padding: 2px 7px; border-radius: 10px; margin-left: 4px; font-weight: 700; }
+.section { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.section h2 { color: var(--accent); margin-bottom: 16px; }
+.section h3 { color: var(--text); margin-bottom: 12px; }
+.welcome-banner { background: linear-gradient(135deg,#1a1a1a,#2a2a2a); border: 2px solid var(--accent); color: var(--text); padding: 28px; border-radius: var(--radius); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+.welcome-banner h2 { font-size: 26px; }
+.role-badge { padding: 7px 18px; border-radius: 20px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+.role-badge.student { background: var(--accent); color: #000; }
+.role-badge.teacher { background: #333; color: var(--accent); border: 1px solid var(--accent); }
+.role-badge.principal { background: var(--accent); color: #000; }
+.role-badge.counselor { background: #2a2a2a; color: var(--accent); border: 1px solid var(--accent); }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-card { background: var(--card); padding: 20px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.stat-number { font-size: 34px; font-weight: 900; color: var(--accent); }
+.stat-label { color: var(--text-light); font-size: 13px; margin-top: 4px; }
+.grades-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 14px; }
+.grade-card { background: var(--card); padding: 18px; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 4px solid var(--accent); }
+.grade-card .class-name { font-weight: 700; font-size: 15px; }
+.grade-card .subject { color: var(--text-light); font-size: 12px; }
+.grade-card .avg-score { font-size: 30px; font-weight: 900; margin: 8px 0; }
+.grade-card .avg-score.grade-a { color: var(--success); }
+.grade-card .avg-score.grade-b { color: #8bc34a; }
+.grade-card .avg-score.grade-c { color: var(--accent); }
+.grade-card .avg-score.grade-d { color: #ff9800; }
+.grade-card .avg-score.grade-f { color: var(--danger); }
+.letter-grade { display: inline-block; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 13px; color: #000; background: var(--accent); }
+.classes-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 18px; }
+.class-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; transition: transform 0.2s,box-shadow 0.2s; border: 1px solid var(--border); }
+.class-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(245,196,0,0.15); border-color: var(--accent); }
+.class-card-img { height: 110px; background: linear-gradient(135deg,#1a1a1a,#333); display: flex; align-items: center; justify-content: center; font-size: 40px; border-bottom: 2px solid var(--accent); }
+.class-card-body { padding: 14px; }
+.class-card-body h3 { font-size: 16px; margin-bottom: 4px; }
+.class-card-body .subject-tag { display: inline-block; padding: 2px 8px; background: rgba(245,196,0,0.15); border-radius: 5px; font-size: 11px; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+.class-card-body .teacher-name { font-size: 12px; color: var(--text-light); }
+.class-header { background: var(--card); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; display: flex; align-items: center; gap: 18px; border: 1px solid var(--border); }
+.class-header .class-icon { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg,#1a1a1a,#333); display: flex; align-items: center; justify-content: center; font-size: 32px; border: 2px solid var(--accent); }
+.class-tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 2px solid var(--border); }
+.class-tabs .tab-btn { border: none; background: transparent; padding: 10px 18px; color: var(--text-light); font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; border-radius: 0; font-size: 14px; }
+.class-tabs .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.assignment-card { background: var(--card); padding: 18px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
+.assignment-card:hover { border-color: var(--accent); }
+.assignment-card h4 { font-size: 15px; }
+.assignment-card .due-date { color: var(--text-light); font-size: 12px; }
+.student-row { background: var(--card); padding: 12px 18px; border-radius: var(--radius); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.student-row .name { font-weight: 600; }
+.student-row .grade-label { color: var(--text-light); font-size: 12px; }
+.filter-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.filter-btn { padding: 7px 18px; border: 2px solid var(--border); border-radius: 20px; background: var(--card); color: var(--text-light); font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 13px; }
+.filter-btn.active, .filter-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+.leaderboard-list { max-width: 600px; }
+.lb-row { background: var(--card); padding: 14px 18px; border-radius: var(--radius); margin-bottom: 8px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.lb-rank { font-size: 22px; font-weight: 900; min-width: 40px; text-align: center; color: var(--text-light); }
+.lb-row:nth-child(1) .lb-rank { color: var(--accent); }
+.lb-row:nth-child(2) .lb-rank { color: #aaa; }
+.lb-row:nth-child(3) .lb-rank { color: #cd7f32; }
+.lb-info { flex: 1; }
+.lb-name { font-weight: 700; }
+.lb-grade { font-size: 12px; color: var(--text-light); }
+.lb-points { font-size: 18px; font-weight: 900; color: var(--accent); }
+.comment-form { background: var(--card); padding: 18px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--border); }
+.comment-form select, .comment-form textarea { padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--card2); color: var(--text); outline: none; }
+.comment-form select:focus, .comment-form textarea:focus { border-color: var(--accent); }
+.comment-card { background: var(--card); padding: 14px 18px; border-radius: var(--radius); margin-bottom: 8px; box-shadow: var(--shadow); border-left: 4px solid var(--border); }
+.comment-card.unseen { border-left-color: var(--accent); background: #1e1c00; }
+.comment-card .from { font-weight: 700; font-size: 13px; color: var(--accent); }
+.comment-card .msg { margin: 6px 0; font-size: 14px; }
+.comment-card .time { font-size: 11px; color: var(--text-light); }
+.users-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.users-table th { background: #000; color: var(--accent); padding: 12px 14px; text-align: left; font-size: 13px; }
+.users-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.users-table tr:hover td { background: var(--card2); }
+.modal-overlay { position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal { background: var(--card); border-radius: var(--radius); width: 90%; max-width: 620px; max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 1px solid var(--accent); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--border); background: #000; }
+.modal-header h3 { color: var(--accent); }
+.modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-light); }
+.modal-body { padding: 22px; }
+.modal-body .form-group { margin-bottom: 14px; }
+.modal-body label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: var(--text-light); }
+.modal-body input, .modal-body select, .modal-body textarea { width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--card2); color: var(--text); outline: none; }
+.modal-body input:focus, .modal-body select:focus, .modal-body textarea:focus { border-color: var(--accent); }
+.popup-overlay { position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.popup-box { background: var(--card); border-radius: var(--radius); padding: 30px; max-width: 440px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 2px solid var(--accent); animation: popIn 0.3s ease; }
+@keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+.popup-header { font-size: 17px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
+.popup-message { font-size: 15px; margin-bottom: 22px; line-height: 1.5; }
+.question-block { background: var(--card2); padding: 14px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
+.question-block h4 { margin-bottom: 8px; font-size: 14px; }
+.question-block .options label { display: block; padding: 7px 10px; margin: 3px 0; background: var(--card); border-radius: 6px; cursor: pointer; font-weight: normal; font-size: 14px; border: 1px solid var(--border); }
+.question-block .options label:hover { border-color: var(--accent); }
+.question-block input[type="text"] { width: 100%; padding: 8px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--card); color: var(--text); }
+.score-display { text-align: center; padding: 28px; }
+.score-display .score-number { font-size: 60px; font-weight: 900; color: var(--accent); }
+.score-display .score-label { font-size: 17px; color: var(--text-light); }
+.score-display .points-earned { font-size: 22px; font-weight: 700; margin-top: 10px; }
+.points-positive { color: var(--success); }
+.points-negative { color: var(--danger); }
+.avatar-builder { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.avatar-preview { width: 120px; height: 120px; border-radius: 50%; background: var(--card2); border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+.avatar-options { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.avatar-opt { width: 48px; height: 48px; border-radius: 50%; background: var(--card2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.2s; }
+.avatar-opt:hover, .avatar-opt.selected { border-color: var(--accent); background: rgba(245,196,0,0.15); }
+.avatar-display { width: 38px; height: 38px; border-radius: 50%; background: var(--card2); border: 2px solid var(--accent); display: inline-flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.games-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+.game-card { background: var(--card); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; }
+.game-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.game-card .game-icon { font-size: 48px; margin-bottom: 10px; }
+.game-card h4 { font-size: 15px; margin-bottom: 4px; }
+.game-card p { font-size: 12px; color: var(--text-light); }
+.game-card .game-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+.game-tag.educational { background: rgba(76,175,80,0.2); color: var(--success); }
+.game-tag.fun { background: rgba(245,196,0,0.2); color: var(--accent); }
+.game-frame-container { background: var(--card); border-radius: var(--radius); overflow: hidden; border: 2px solid var(--accent); margin-top: 16px; }
+.game-frame-container iframe { width: 100%; height: 500px; border: none; display: block; }
+.meeting-card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.meeting-card.live { border-color: var(--success); background: rgba(76,175,80,0.05); }
+.meeting-card .meeting-title { font-weight: 700; font-size: 15px; }
+.meeting-card .meeting-info { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); margin-right: 6px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.monitor-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 14px; }
+.monitor-card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
+.monitor-card .monitor-name { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.monitor-card .monitor-page { font-size: 13px; color: var(--accent); }
+.monitor-card .monitor-time { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+.online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; }
+.offline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); display: inline-block; }
+.ann-manage-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ann-manage-card .ann-text { flex: 1; font-size: 14px; }
+.ann-manage-card .ann-meta { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+@media (max-width:768px) {
+  .navbar { flex-direction: column; height: auto; padding: 10px; gap: 6px; }
+  .nav-center { flex-wrap: wrap; justify-content: center; }
+  .welcome-banner { flex-direction: column; text-align: center; gap: 10px; }
+  .class-header { flex-direction: column; text-align: center; }
+  .landing-title { font-size: 36px; }
+}
+  </style>
+</head>
+<body>
+
+<!-- POPUP NOTIFICATION -->
+<div id="popup-overlay" class="popup-overlay hidden">
+  <div class="popup-box">
+    <div class="popup-header">📢 Message from <span id="popup-from"></span></div>
+    <div id="popup-message" class="popup-message"></div>
+    <button onclick="dismissPopup()" class="btn btn-primary">OK</button>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div id="page-landing" class="page">
+  <div class="landing-container">
+    <div class="landing-logo">
+      <div class="bomber-icon">🏈</div>
+      <h1 class="landing-title">MCMS BOMBERS</h1>
+      <p class="landing-subtitle">Midwest City Middle School</p>
+    </div>
+    <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+      <input type="text" id="login-username" placeholder="Username" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit" class="btn btn-primary btn-full">Login</button>
+      <div id="login-error" class="error-msg"></div>
+      <p style="text-align:center;color:var(--text-light);font-size:13px;margin-top:8px;">Ask your teacher or principal to create your account.</p>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page hidden">
+  <div id="announcement-bar" class="hidden">
+    <span class="ann-icon">📣</span>
+    <div class="ann-content" id="ann-content"></div>
+    <button class="ann-dismiss" id="ann-dismiss-btn" style="display:none" onclick="dismissAnnouncement()">Remove</button>
+  </div>
+  <nav class="navbar">
+    <div class="nav-left"><span class="nav-logo">MCMS BOMBERS</span></div>
+    <div class="nav-center">
+      <button class="nav-btn active" data-page="dashboard" onclick="showSection('dashboard')">Dashboard</button>
+      <button class="nav-btn" data-page="classes" onclick="showSection('classes')">Classes</button>
+      <button class="nav-btn" data-page="games" onclick="showSection('games')">Games</button>
+      <button class="nav-btn" data-page="meetings" onclick="showSection('meetings')">Meetings</button>
+      <button class="nav-btn" data-page="leaderboard" onclick="showSection('leaderboard')">Leaderboard</button>
+      <button class="nav-btn" data-page="comments" onclick="showSection('comments')">Messages <span id="msg-badge" class="badge hidden">0</span></button>
+      <button class="nav-btn" data-page="users" onclick="showSection('users')" id="nav-users" style="display:none">All Users</button>
+      <button class="nav-btn" data-page="monitor" onclick="showSection('monitor')" id="nav-monitor" style="display:none">Monitor</button>
+      <button class="nav-btn" id="nav-create-account" style="display:none" onclick="showCreateAccount()">+ Account</button>
+      <button class="nav-btn" data-page="announcements" onclick="showSection('announcements')" id="nav-announcements" style="display:none">Announcements</button>
+    </div>
+    <div class="nav-right">
+      <div id="nav-avatar" class="avatar-display" onclick="showAvatarBuilder()" title="Edit Avatar" style="cursor:pointer">😊</div>
+      <span id="user-info" class="user-info"></span>
+      <button class="btn btn-sm btn-outline" onclick="handleLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <div id="section-dashboard" class="section">
+    <div class="welcome-banner">
+      <div><h2>Welcome, <span id="welcome-name"></span>!</h2><p style="color:var(--text-light);font-size:13px;margin-top:4px" id="grade-display"></p></div>
+      <div class="role-badge" id="role-badge"></div>
+    </div>
+    <div id="student-stats" class="stats-row hidden">
+      <div class="stat-card"><div class="stat-number" id="stat-points">0</div><div class="stat-label">Total Points</div></div>
+      <div class="stat-card"><div class="stat-number" id="stat-classes">0</div><div class="stat-label">My Classes</div></div>
+      <div class="stat-card"><div class="stat-number" id="stat-assignments">0</div><div class="stat-label">Assignments Done</div></div>
+    </div>
+    <div id="student-grades" class="hidden"><h3>My Grades</h3><div id="grades-list" class="grades-grid"></div></div>
+  </div>
+
+  <div id="section-classes" class="section hidden">
+    <div class="section-header"><h2>My Classes</h2><button class="btn btn-primary" id="btn-create-class" style="display:none" onclick="showCreateClass()">+ Create Class</button></div>
+    <div id="classes-grid" class="classes-grid"></div>
+  </div>
+
+  <div id="section-class-detail" class="section hidden">
+    <button class="btn btn-sm btn-outline mb-1" onclick="showSection('classes')">← Back</button>
+    <div class="class-header" id="class-header"></div>
+    <div class="class-tabs">
+      <button class="tab-btn active" onclick="showClassTab('assignments',this)">Assignments</button>
+      <button class="tab-btn" onclick="showClassTab('students',this)">Students</button>
+      <button class="tab-btn" onclick="showClassTab('add-students',this)" id="tab-add-students" style="display:none">Add Students</button>
+    </div>
+    <div id="class-tab-assignments" class="class-tab"><button class="btn btn-primary mb-1" id="btn-create-assignment" style="display:none" onclick="showCreateAssignment()">+ Assignment</button><div id="assignments-list"></div></div>
+    <div id="class-tab-students" class="class-tab hidden"><div id="class-students-list"></div></div>
+    <div id="class-tab-add-students" class="class-tab hidden"><div id="available-students-list"></div></div>
+  </div>
+
+  <div id="section-assignment" class="section hidden">
+    <button class="btn btn-sm btn-outline mb-1" onclick="backToClassDetail()">← Back</button>
+    <div id="assignment-content"></div>
+  </div>
+
+  <div id="section-games" class="section hidden">
+    <div class="section-header"><h2>🎮 Games</h2>
+      <div style="display:flex;gap:8px">
+        <button class="filter-btn active" onclick="filterGames('all',this)">All</button>
+        <button class="filter-btn" onclick="filterGames('educational',this)">Educational</button>
+        <button class="filter-btn" onclick="filterGames('fun',this)">Fun</button>
+      </div>
+    </div>
+    <div id="games-locked-msg" class="hidden" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;color:var(--text-light)">🔒 Games are locked. Your teacher or principal needs to approve your access.</div>
+    <div id="games-grid" class="games-grid"></div>
+    <div id="game-frame-area" class="hidden">
+      <button class="btn btn-sm btn-outline mb-1" onclick="closeGame()">← Back to Games</button>
+      <div class="game-frame-container"><iframe id="game-iframe" src="" allowfullscreen></iframe></div>
+    </div>
+  </div>
+
+  <div id="section-meetings" class="section hidden">
+    <div class="section-header"><h2>📹 Meetings</h2><button class="btn btn-primary" id="btn-create-meeting" style="display:none" onclick="showCreateMeeting()">+ Host Meeting</button></div>
+    <div id="meetings-list"></div>
+  </div>
+
+  <div id="section-leaderboard" class="section hidden">
+    <h2>🏆 Leaderboard</h2>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="loadLeaderboard('',this)">All Grades</button>
+      <button class="filter-btn" onclick="loadLeaderboard(6,this)">6th Grade</button>
+      <button class="filter-btn" onclick="loadLeaderboard(7,this)">7th Grade</button>
+      <button class="filter-btn" onclick="loadLeaderboard(8,this)">8th Grade</button>
+    </div>
+    <div id="leaderboard-list" class="leaderboard-list"></div>
+  </div>
+
+  <div id="section-comments" class="section hidden">
+    <h2>Messages</h2>
+    <div id="send-comment-area" style="display:none">
+      <h3>Send a Message</h3>
+      <div class="comment-form">
+        <select id="comment-to"></select>
+        <textarea id="comment-msg" placeholder="Type your message..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendComment()">Send</button>
+      </div>
+    </div>
+    <h3>My Messages</h3>
+    <div id="comments-list"></div>
+  </div>
+
+  <div id="section-users" class="section hidden"><div class="section-header"><h2>All Users</h2></div><div id="users-list"></div></div>
+  <div id="section-monitor" class="section hidden"><h2>👁️ Student Activity Monitor</h2><p style="color:var(--text-light);margin-bottom:16px;font-size:13px">Shows what page each student is currently on.</p><div id="monitor-grid" class="monitor-grid"></div></div>
+  <div id="section-announcements" class="section hidden"><div class="section-header"><h2>📣 Announcements</h2><button class="btn btn-primary" onclick="showCreateAnnouncement()">+ New Announcement</button></div><div id="announcements-manage-list"></div></div>
+
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== MCMS BOMBERS =====
+
+// ===== DATABASE =====
+const DB = {
+  _get(k) { try { return JSON.parse(localStorage.getItem('mcms_' + k)) || []; } catch { return []; } },
+  _set(k, v) { localStorage.setItem('mcms_' + k, JSON.stringify(v)); },
+  _nextId(k) { const i = this._get(k); return i.length ? Math.max(...i.map(x => x.id)) + 1 : 1; },
+
+  getUsers() { return this._get('users'); },
+  saveUsers(u) { this._set('users', u); },
+  getClasses() { return this._get('classes'); },
+  saveClasses(c) { this._set('classes', c); },
+  getClassStudents() { return this._get('cs'); },
+  saveClassStudents(cs) { this._set('cs', cs); },
+  getAssignments() { return this._get('assignments'); },
+  saveAssignments(a) { this._set('assignments', a); },
+  getSubmissions() { return this._get('submissions'); },
+  saveSubmissions(s) { this._set('submissions', s); },
+  getComments() { return this._get('comments'); },
+  saveComments(c) { this._set('comments', c); },
+  getMeetings() { return this._get('meetings'); },
+  saveMeetings(m) { this._set('meetings', m); },
+  getAnnouncements() { return this._get('announcements'); },
+  saveAnnouncements(a) { this._set('announcements', a); },
+  getActivity() { return this._get('activity'); },
+  saveActivity(a) { this._set('activity', a); },
+
+  init() {
+    const users = this.getUsers();
+    if (!users.find(u => u.role === 'principal')) {
+      users.push({ id: 1, username: 'principal', password: 'principal123', display_name: 'Principal', role: 'principal', grade: null, total_points: 0, avatar: '👤', games_allowed: 'all', games_type: 'all' });
+      this.saveUsers(users);
+    }
+  },
+
+  addUser(username, password, display_name, role, grade) {
+    const users = this.getUsers();
+    if (users.find(u => u.username === username)) return null;
+    const user = { id: this._nextId('users'), username, password, display_name, role, grade: grade ? parseInt(grade) : null, total_points: 0, avatar: '😊', games_allowed: 'pending', games_type: 'all' };
+    users.push(user);
+    this.saveUsers(users);
+    return user;
+  },
+
+  findUser(username, password) { return this.getUsers().find(u => u.username === username && u.password === password); },
+
+  updateUser(id, updates) {
+    const users = this.getUsers();
+    const i = users.findIndex(u => u.id === id);
+    if (i >= 0) { users[i] = { ...users[i], ...updates }; this.saveUsers(users); return users[i]; }
+    return null;
+  },
+
+  deleteUser(id) {
+    // Remove user
+    this.saveUsers(this.getUsers().filter(u => u.id !== id));
+    // Remove from all classes
+    this.saveClassStudents(this.getClassStudents().filter(r => r.student_id !== id));
+    // Remove their submissions
+    this.saveSubmissions(this.getSubmissions().filter(s => s.student_id !== id));
+    // Remove their comments
+    this.saveComments(this.getComments().filter(c => c.from_id !== id && c.to_id !== id));
+    // Remove their classes if teacher
+    const teacherClasses = this.getClasses().filter(c => c.teacher_id === id).map(c => c.id);
+    this.saveClasses(this.getClasses().filter(c => c.teacher_id !== id));
+    // Remove assignments from deleted teacher's classes
+    this.saveAssignments(this.getAssignments().filter(a => !teacherClasses.includes(a.class_id)));
+  },
+
+  addClass(name, subject, grade, teacherId) {
+    const classes = this.getClasses();
+    const cls = { id: this._nextId('classes'), name, subject, grade: parseInt(grade), teacher_id: teacherId };
+    classes.push(cls);
+    this.saveClasses(classes);
+    return cls;
+  },
+
+  addStudentToClass(classId, studentId) {
+    const cs = this.getClassStudents();
+    if (cs.find(r => r.class_id === classId && r.student_id === studentId)) return false;
+    cs.push({ id: this._nextId('cs'), class_id: classId, student_id: studentId });
+    this.saveClassStudents(cs);
+    return true;
+  },
+
+  removeStudentFromClass(classId, studentId) {
+    this.saveClassStudents(this.getClassStudents().filter(r => !(r.class_id === classId && r.student_id === studentId)));
+  },
+
+  getStudentsInClass(classId) {
+    const cs = this.getClassStudents().filter(r => r.class_id === classId);
+    const users = this.getUsers();
+    return cs.map(r => users.find(u => u.id === r.student_id)).filter(Boolean);
+  },
+
+  getClassesForStudent(studentId) {
+    const cs = this.getClassStudents().filter(r => r.student_id === studentId);
+    return cs.map(r => this.getClasses().find(c => c.id === r.class_id)).filter(Boolean);
+  },
+
+  getClassesForTeacher(teacherId) { return this.getClasses().filter(c => c.teacher_id === teacherId); },
+
+  addAssignment(classId, title, description, questions, dueDate) {
+    const assignments = this.getAssignments();
+    const a = { id: this._nextId('assignments'), class_id: classId, title, description: description || '', questions, due_date: dueDate || '' };
+    assignments.push(a);
+    this.saveAssignments(assignments);
+    return a;
+  },
+
+  getAssignmentsForClass(classId) { return this.getAssignments().filter(a => a.class_id === classId); },
+
+  submitAssignment(assignmentId, studentId, answers) {
+    const subs = this.getSubmissions();
+    if (subs.find(s => s.assignment_id === assignmentId && s.student_id === studentId)) return null;
+    const assignment = this.getAssignments().find(a => a.id === assignmentId);
+    if (!assignment) return null;
+    let correct = 0;
+    assignment.questions.forEach((q, i) => {
+      if (answers[i] && answers[i].toString().trim().toLowerCase() === q.correct_answer.toString().trim().toLowerCase()) correct++;
+    });
+    const score = Math.round((correct / assignment.questions.length) * 100);
+    let points = score >= 90 ? 100 : score >= 80 ? 75 : score >= 70 ? 50 : score >= 60 ? 25 : -20;
+    subs.push({ id: this._nextId('submissions'), assignment_id: assignmentId, student_id: studentId, answers, score, points });
+    this.saveSubmissions(subs);
+    const users = this.getUsers();
+    const user = users.find(u => u.id === studentId);
+    if (user) { user.total_points += points; this.saveUsers(users); }
+    // Games require explicit teacher/principal approval — no auto-unlock
+    this.checkGamesUnlock(studentId);
+    return { score, points, correct, total: assignment.questions.length };
+  },
+
+  checkGamesUnlock(studentId) {
+    // Intentionally empty — games only unlock via staff approval
+  },
+
+  getSubmission(assignmentId, studentId) { return this.getSubmissions().find(s => s.assignment_id === assignmentId && s.student_id === studentId); },
+
+  getSubmissionsForAssignment(assignmentId) {
+    const subs = this.getSubmissions().filter(s => s.assignment_id === assignmentId);
+    const users = this.getUsers();
+    return subs.map(s => {
+      const u = users.find(x => x.id === s.student_id) || {};
+      return { ...s, display_name: u.display_name, username: u.username };
+    });
+  },
+
+  addComment(fromId, toId, message) {
+    const comments = this.getComments();
+    comments.push({ id: this._nextId('comments'), from_id: fromId, to_id: toId, message, seen: false, created_at: new Date().toISOString() });
+    this.saveComments(comments);
+  },
+
+  getCommentsFor(userId) {
+    const users = this.getUsers();
+    return this.getComments().filter(c => c.to_id === userId).map(c => ({
+      ...c, from_name: (users.find(u => u.id === c.from_id) || {}).display_name || 'Unknown'
+    })).reverse();
+  },
+
+  getUnseenComments(userId) { return this.getCommentsFor(userId).filter(c => !c.seen); },
+  markSeen(id) { const c = this.getComments(); const x = c.find(i => i.id === id); if (x) { x.seen = true; this.saveComments(c); } },
+
+  addMeeting(title, type, hostId, link) {
+    const meetings = this.getMeetings();
+    const m = { id: this._nextId('meetings'), title, type, host_id: hostId, link, active: true, created_at: new Date().toISOString() };
+    meetings.push(m);
+    this.saveMeetings(meetings);
+    return m;
+  },
+
+  endMeeting(id) {
+    const meetings = this.getMeetings();
+    const m = meetings.find(x => x.id === id);
+    if (m) { m.active = false; this.saveMeetings(meetings); }
+  },
+
+  addAnnouncement(message, authorId) {
+    const anns = this.getAnnouncements();
+    const a = { id: this._nextId('announcements'), message, author_id: authorId, active: true, created_at: new Date().toISOString() };
+    anns.push(a);
+    this.saveAnnouncements(anns);
+    return a;
+  },
+
+  removeAnnouncement(id) {
+    const anns = this.getAnnouncements();
+    const a = anns.find(x => x.id === id);
+    if (a) { a.active = false; this.saveAnnouncements(anns); }
+  },
+
+  getActiveAnnouncements() { return this.getAnnouncements().filter(a => a.active); },
+
+  updateActivity(userId, page) {
+    const activity = this.getActivity();
+    const existing = activity.find(a => a.user_id === userId);
+    if (existing) { existing.page = page; existing.updated_at = new Date().toISOString(); }
+    else activity.push({ user_id: userId, page, updated_at: new Date().toISOString() });
+    this.saveActivity(activity);
+  },
+
+  getStudentActivity() {
+    const activity = this.getActivity();
+    const users = this.getUsers().filter(u => u.role === 'student');
+    return users.map(u => {
+      const a = activity.find(x => x.user_id === u.id);
+      return { ...u, current_page: a ? a.page : 'Not online', last_seen: a ? a.updated_at : null };
+    });
+  }
+};
+
+DB.init();
+
+// ===== STATE =====
+let currentUser = null;
+let currentClassId = null;
+let commentInterval = null;
+let activityInterval = null;
+let questionCount = 0;
+
+// ===== ACTIVITY TRACKING =====
+function trackPage(page) {
+  if (currentUser) DB.updateActivity(currentUser.id, page);
+}
+
+// ===== AUTH =====
+function handleLogin(e) {
+  e.preventDefault();
+  const user = DB.findUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('mcms_session', JSON.stringify({ id: user.id }));
+    showDashboard();
+  } else {
+    document.getElementById('login-error').textContent = 'Invalid username or password';
+  }
+}
+
+function handleLogout() {
+  if (currentUser) DB.updateActivity(currentUser.id, 'Offline');
+  currentUser = null;
+  localStorage.removeItem('mcms_session');
+  if (commentInterval) clearInterval(commentInterval);
+  if (activityInterval) clearInterval(activityInterval);
+  document.getElementById('page-dashboard').classList.add('hidden');
+  document.getElementById('page-landing').classList.remove('hidden');
+}
+
+function checkAuth() {
+  try {
+    const s = JSON.parse(localStorage.getItem('mcms_session'));
+    if (s) { const u = DB.getUsers().find(x => x.id === s.id); if (u) { currentUser = u; showDashboard(); } }
+  } catch (e) {}
+}
+
+// ===== CREATE ACCOUNT =====
+function showCreateAccount() {
+  const isPrincipalOrCounselor = ['principal','counselor'].includes(currentUser.role);
+  const roleOptions = isPrincipalOrCounselor
+    ? '<option value="student">Student</option><option value="teacher">Teacher</option><option value="counselor">Counselor</option>'
+    : '<option value="student">Student</option>';
+
+  openModal('Create New Account', `
+    <form onsubmit="handleCreateAccount(event)">
+      <div class="form-group"><label>Username</label><input type="text" id="ca-username" required placeholder="Login username"></div>
+      <div class="form-group"><label>Display Name</label><input type="text" id="ca-display" required placeholder="Full name"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="ca-password" required placeholder="Password"></div>
+      <div class="form-group"><label>Role</label>
+        <select id="ca-role" required onchange="toggleCreateGrade()">
+          <option value="">Select Role</option>${roleOptions}
+        </select>
+      </div>
+      <div class="form-group" id="ca-grade-group" style="display:none"><label>Grade Level</label>
+        <select id="ca-grade">
+          <option value="">Select Grade</option>
+          <option value="6">6th Grade</option><option value="7">7th Grade</option><option value="8">8th Grade</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      <div id="ca-error" class="error-msg" style="margin-top:8px"></div>
+      <div id="ca-success" style="margin-top:8px;color:var(--success);text-align:center;font-size:14px"></div>
+    </form>
+  `);
+}
+
+function toggleCreateGrade() {
+  document.getElementById('ca-grade-group').style.display = document.getElementById('ca-role').value === 'student' ? '' : 'none';
+}
+
+function handleCreateAccount(e) {
+  e.preventDefault();
+  const role = document.getElementById('ca-role').value;
+  if (['teacher','counselor'].includes(role) && !['principal','counselor'].includes(currentUser.role)) {
+    document.getElementById('ca-error').textContent = 'Only principal/counselor can create staff accounts';
+    return;
+  }
+  const user = DB.addUser(
+    document.getElementById('ca-username').value,
+    document.getElementById('ca-password').value,
+    document.getElementById('ca-display').value,
+    role,
+    document.getElementById('ca-grade').value
+  );
+  if (user) {
+    document.getElementById('ca-error').textContent = '';
+    document.getElementById('ca-success').textContent = '✅ Account created for ' + user.display_name + '!';
+    document.getElementById('ca-username').value = '';
+    document.getElementById('ca-display').value = '';
+    document.getElementById('ca-password').value = '';
+  } else {
+    document.getElementById('ca-success').textContent = '';
+    document.getElementById('ca-error').textContent = 'Username already taken';
+  }
+}
+
+// ===== AVATAR =====
+const AVATARS = ['😊','😎','🤓','😄','🙂','😏','🤩','😇','🥳','😤','🤔','😴','🦁','🐯','🐻','🦊','🐼','🐸','🐧','🦅','🏈','⭐','🔥','💎','🎯'];
+
+function showAvatarBuilder() {
+  const current = currentUser.avatar || '😊';
+  openModal('Customize Your Avatar', `
+    <div class="avatar-builder">
+      <div class="avatar-preview" id="avatar-preview-big">${current}</div>
+      <p style="color:var(--text-light);font-size:13px">Pick your avatar</p>
+      <div class="avatar-options">
+        ${AVATARS.map(a => `<div class="avatar-opt ${a === current ? 'selected' : ''}" onclick="selectAvatar('${a}')">${a}</div>`).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="saveAvatar()">Save Avatar</button>
+    </div>
+  `);
+}
+
+let selectedAvatar = null;
+function selectAvatar(a) {
+  selectedAvatar = a;
+  document.getElementById('avatar-preview-big').textContent = a;
+  document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+function saveAvatar() {
+  if (!selectedAvatar) return;
+  DB.updateUser(currentUser.id, { avatar: selectedAvatar });
+  currentUser.avatar = selectedAvatar;
+  document.getElementById('nav-avatar').textContent = selectedAvatar;
+  closeModal();
+}
+
+// ===== DASHBOARD =====
+function showDashboard() {
+  currentUser = DB.getUsers().find(u => u.id === currentUser.id) || currentUser;
+  document.getElementById('page-landing').classList.add('hidden');
+  document.getElementById('page-dashboard').classList.remove('hidden');
+
+  document.getElementById('welcome-name').textContent = currentUser.display_name;
+  document.getElementById('nav-avatar').textContent = currentUser.avatar || '😊';
+  const badge = document.getElementById('role-badge');
+  badge.textContent = currentUser.role.toUpperCase();
+  badge.className = 'role-badge ' + currentUser.role;
+
+  const gradeDisplay = document.getElementById('grade-display');
+  if (currentUser.grade) gradeDisplay.textContent = currentUser.grade + 'th Grade';
+  else gradeDisplay.textContent = '';
+
+  document.getElementById('user-info').textContent = currentUser.display_name;
+
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  if (isStaff) {
+    document.getElementById('btn-create-class').style.display = '';
+    document.getElementById('send-comment-area').style.display = '';
+    document.getElementById('nav-create-account').style.display = '';
+    document.getElementById('nav-users').style.display = '';
+    document.getElementById('nav-monitor').style.display = '';
+    document.getElementById('nav-announcements').style.display = '';
+    document.getElementById('btn-create-meeting').style.display = '';
+  }
+  if (currentUser.role === 'student') {
+    document.getElementById('student-stats').classList.remove('hidden');
+    document.getElementById('student-grades').classList.remove('hidden');
+    document.getElementById('stat-points').textContent = currentUser.total_points || 0;
+    loadMyGrades();
+  }
+
+  loadAnnouncements();
+  showSection('dashboard');
+  checkComments();
+  startPolling();
+  trackPage('Dashboard');
+}
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('section-' + name).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const nb = document.querySelector('.nav-btn[data-page="' + name + '"]');
+  if (nb) nb.classList.add('active');
+
+  const pageNames = { dashboard:'Dashboard', classes:'Classes', games:'Games', meetings:'Meetings', leaderboard:'Leaderboard', comments:'Messages', users:'All Users', monitor:'Monitor', announcements:'Announcements' };
+  trackPage(pageNames[name] || name);
+
+  if (name === 'classes') loadClasses();
+  if (name === 'leaderboard') loadLeaderboard('', document.querySelector('.filter-btn'));
+  if (name === 'comments') loadComments();
+  if (name === 'users') loadUsers();
+  if (name === 'games') loadGames();
+  if (name === 'meetings') loadMeetings();
+  if (name === 'monitor') loadMonitor();
+  if (name === 'announcements') loadAnnouncementsManage();
+}
+
+// ===== ANNOUNCEMENTS =====
+function loadAnnouncements() {
+  const anns = DB.getActiveAnnouncements();
+  const bar = document.getElementById('announcement-bar');
+  const content = document.getElementById('ann-content');
+  const dismissBtn = document.getElementById('ann-dismiss-btn');
+
+  if (!anns.length) { bar.classList.add('hidden'); return; }
+
+  bar.classList.remove('hidden');
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  if (isStaff) dismissBtn.style.display = '';
+
+  // Show all active announcements
+  content.innerHTML = anns.map(a => {
+    // Convert URLs in message to clickable links
+    const linked = linkify(esc(a.message));
+    return '<div style="margin-bottom:4px">' + linked + '</div>';
+  }).join('');
+}
+
+function linkify(text) {
+  return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+
+function dismissAnnouncement() {
+  const anns = DB.getActiveAnnouncements();
+  if (anns.length) { DB.removeAnnouncement(anns[anns.length - 1].id); loadAnnouncements(); }
+}
+
+function showCreateAnnouncement() {
+  openModal('New Announcement', `
+    <form onsubmit="createAnnouncement(event)">
+      <div class="form-group">
+        <label>Message (you can include URLs — they become clickable links)</label>
+        <textarea id="ann-msg" rows="4" required placeholder="Type your announcement... You can paste a URL like https://example.com"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Post Announcement</button>
+    </form>
+  `);
+}
+
+function createAnnouncement(e) {
+  e.preventDefault();
+  DB.addAnnouncement(document.getElementById('ann-msg').value, currentUser.id);
+  closeModal();
+  loadAnnouncements();
+  loadAnnouncementsManage();
+}
+
+function loadAnnouncementsManage() {
+  const anns = DB.getAnnouncements().reverse();
+  const users = DB.getUsers();
+  const container = document.getElementById('announcements-manage-list');
+
+  if (!anns.length) { container.innerHTML = '<p style="color:var(--text-light)">No announcements yet.</p>'; return; }
+
+  container.innerHTML = anns.map(a => {
+    const author = users.find(u => u.id === a.author_id);
+    const linked = linkify(esc(a.message));
+    return '<div class="ann-manage-card">' +
+      '<div class="ann-text">' + linked +
+      '<div class="ann-meta">By ' + esc(author ? author.display_name : 'Unknown') + ' · ' + new Date(a.created_at).toLocaleString() + (a.active ? ' · <span style="color:var(--success)">Active</span>' : ' · <span style="color:var(--text-light)">Removed</span>') + '</div></div>' +
+      (a.active ? '<button class="btn btn-sm btn-danger" onclick="removeAnn(' + a.id + ')">Remove</button>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function removeAnn(id) {
+  DB.removeAnnouncement(id);
+  loadAnnouncements();
+  loadAnnouncementsManage();
+}
+
+// ===== MY GRADES =====
+function loadMyGrades() {
+  const myClasses = DB.getClassesForStudent(currentUser.id);
+  const container = document.getElementById('grades-list');
+  if (!myClasses.length) { container.innerHTML = '<p style="color:var(--text-light)">No classes yet.</p>'; return; }
+
+  let totalSubs = 0;
+  container.innerHTML = myClasses.map(c => {
+    const assignments = DB.getAssignmentsForClass(c.id);
+    const subs = assignments.map(a => DB.getSubmission(a.id, currentUser.id)).filter(Boolean);
+    totalSubs += subs.length;
+    const avg = subs.length ? Math.round(subs.reduce((s, x) => s + x.score, 0) / subs.length) : null;
+    let letter = 'N/A', colorClass = '', bgColor = '#555';
+    if (avg !== null) {
+      if (avg >= 90) { letter = 'A'; colorClass = 'grade-a'; bgColor = 'var(--success)'; }
+      else if (avg >= 80) { letter = 'B'; colorClass = 'grade-b'; bgColor = '#8bc34a'; }
+      else if (avg >= 70) { letter = 'C'; colorClass = 'grade-c'; bgColor = 'var(--accent)'; }
+      else if (avg >= 60) { letter = 'D'; colorClass = 'grade-d'; bgColor = '#ff9800'; }
+      else { letter = 'F'; colorClass = 'grade-f'; bgColor = 'var(--danger)'; }
+    }
+    return '<div class="grade-card">' +
+      '<div class="class-name">' + esc(c.name) + '</div>' +
+      '<div class="subject">' + esc(c.subject) + '</div>' +
+      '<div class="avg-score ' + colorClass + '">' + (avg !== null ? avg + '%' : 'No grades') + '</div>' +
+      '<span class="letter-grade" style="background:' + bgColor + ';color:' + (bgColor === 'var(--accent)' ? '#000' : 'white') + '">' + letter + '</span>' +
+      ' <span style="font-size:11px;color:var(--text-light)">' + subs.length + '/' + assignments.length + ' done</span></div>';
+  }).join('');
+
+  document.getElementById('stat-classes').textContent = myClasses.length;
+  document.getElementById('stat-assignments').textContent = totalSubs;
+  document.getElementById('stat-points').textContent = DB.getUsers().find(u => u.id === currentUser.id).total_points || 0;
+}
+
+// ===== CLASSES =====
+function loadClasses() {
+  let classes;
+  if (currentUser.role === 'teacher') classes = DB.getClassesForTeacher(currentUser.id);
+  else if (currentUser.role === 'student') classes = DB.getClassesForStudent(currentUser.id);
+  else classes = DB.getClasses();
+
+  const grid = document.getElementById('classes-grid');
+  if (!classes.length) { grid.innerHTML = '<p style="color:var(--text-light)">No classes yet.</p>'; return; }
+
+  const users = DB.getUsers();
+  const icons = { 'Math':'📐','Science':'🔬','English':'📚','History':'🏛️','Art':'🎨','Music':'🎵','PE':'🏃','Technology':'💻','Reading':'📖','Writing':'✍️','Social Studies':'🌍' };
+
+  grid.innerHTML = classes.map(c => {
+    const teacher = users.find(u => u.id === c.teacher_id);
+    return '<div class="class-card" onclick="openClass(' + c.id + ')">' +
+      '<div class="class-card-img"><span>' + (icons[c.subject] || '📝') + '</span></div>' +
+      '<div class="class-card-body"><h3>' + esc(c.name) + '</h3>' +
+      '<span class="subject-tag">' + esc(c.subject) + ' · ' + c.grade + 'th</span>' +
+      '<div class="teacher-name">Teacher: ' + esc(teacher ? teacher.display_name : 'Unknown') + '</div></div></div>';
+  }).join('');
+}
+
+function showCreateClass() {
+  openModal('Create New Class', `
+    <form onsubmit="createClass(event)">
+      <div class="form-group"><label>Class Name</label><input type="text" id="cc-name" required placeholder="e.g. Mrs. Smith's Math"></div>
+      <div class="form-group"><label>Subject</label>
+        <select id="cc-subject" required>
+          <option value="">Select Subject</option>
+          <option>Math</option><option>Science</option><option>English</option><option>Reading</option>
+          <option>Writing</option><option>History</option><option>Social Studies</option>
+          <option>Art</option><option>Music</option><option>PE</option><option>Technology</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Grade Level</label>
+        <select id="cc-grade" required>
+          <option value="">Select Grade</option>
+          <option value="6">6th Grade</option><option value="7">7th Grade</option><option value="8">8th Grade</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Class</button>
+    </form>
+  `);
+}
+
+function createClass(e) {
+  e.preventDefault();
+  DB.addClass(document.getElementById('cc-name').value, document.getElementById('cc-subject').value, document.getElementById('cc-grade').value, currentUser.id);
+  closeModal();
+  loadClasses();
+}
+
+function openClass(id) {
+  currentClassId = id;
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('section-class-detail').classList.remove('hidden');
+  trackPage('Class Detail');
+
+  const cls = DB.getClasses().find(c => c.id === id);
+  const teacher = DB.getUsers().find(u => u.id === cls.teacher_id);
+  document.getElementById('class-header').innerHTML =
+    '<div class="class-icon">📚</div><div><h2>' + esc(cls.name) + '</h2>' +
+    '<p style="color:var(--text-light);font-size:13px">' + esc(cls.subject) + ' · ' + cls.grade + 'th Grade · Teacher: ' + esc(teacher ? teacher.display_name : 'Unknown') + '</p></div>';
+
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  document.getElementById('btn-create-assignment').style.display = isStaff ? '' : 'none';
+  document.getElementById('tab-add-students').style.display = isStaff ? '' : 'none';
+
+  showClassTab('assignments', document.querySelector('.class-tabs .tab-btn'));
+  loadAssignments(id);
+  loadClassStudents(id);
+}
+
+function showClassTab(tab, btn) {
+  document.querySelectorAll('.class-tab').forEach(t => t.classList.add('hidden'));
+  document.getElementById('class-tab-' + tab).classList.remove('hidden');
+  document.querySelectorAll('.class-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (tab === 'add-students') loadAvailableStudents(currentClassId);
+}
+
+function backToClassDetail() {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('section-class-detail').classList.remove('hidden');
+}
+
+// ===== ASSIGNMENTS =====
+function loadAssignments(classId) {
+  const assignments = DB.getAssignmentsForClass(classId);
+  const container = document.getElementById('assignments-list');
+  if (!assignments.length) { container.innerHTML = '<p style="color:var(--text-light)">No assignments yet.</p>'; return; }
+  container.innerHTML = assignments.map(a => {
+    const done = currentUser.role === 'student' ? DB.getSubmission(a.id, currentUser.id) : null;
+    return '<div class="assignment-card" onclick="openAssignment(' + a.id + ')">' +
+      '<div><h4>' + esc(a.title) + (done ? ' <span style="color:var(--success);font-size:12px">✅ Done</span>' : '') + '</h4>' +
+      '<span class="due-date">' + (a.due_date ? 'Due: ' + a.due_date : 'No due date') + '</span></div>' +
+      '<span style="font-size:12px;color:var(--text-light)">' + a.questions.length + ' questions</span></div>';
+  }).join('');
+}
+
+function showCreateAssignment() {
+  questionCount = 0;
+  openModal('Create Assignment', `
+    <form onsubmit="createAssignment(event)">
+      <div class="form-group"><label>Title</label><input type="text" id="ca-title" required placeholder="Assignment title"></div>
+      <div class="form-group"><label>Description (optional)</label><textarea id="ca-desc" rows="2" placeholder="Instructions"></textarea></div>
+      <div class="form-group"><label>Due Date (optional)</label><input type="date" id="ca-due"></div>
+      <div id="questions-container">
+        <h4 style="margin-bottom:8px">Questions</h4>
+        <div id="questions-list"></div>
+        <button type="button" class="btn btn-sm btn-dark" onclick="addQuestion()">+ Add Question</button>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-primary btn-full">Create Assignment</button>
+    </form>
+  `);
+  addQuestion();
+}
+
+function addQuestion() {
+  questionCount++;
+  const n = questionCount;
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.innerHTML = `<label>Question ${n}</label>
+    <input type="text" id="q-text-${n}" placeholder="Enter question" required>
+    <label style="margin-top:8px">Type</label>
+    <select id="q-type-${n}" onchange="toggleQType(${n})">
+      <option value="multiple_choice">Multiple Choice</option>
+      <option value="short_answer">Short Answer</option>
+      <option value="true_false">True/False</option>
+    </select>
+    <div id="q-opts-wrap-${n}" style="margin-top:8px">
+      <label>Options (one per line)</label>
+      <textarea id="q-opts-${n}" rows="4" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea>
+    </div>
+    <label style="margin-top:8px">Correct Answer</label>
+    <input type="text" id="q-answer-${n}" placeholder="Exact correct answer" required>`;
+  document.getElementById('questions-list').appendChild(div);
+}
+
+function toggleQType(n) {
+  const t = document.getElementById('q-type-' + n).value;
+  document.getElementById('q-opts-wrap-' + n).style.display = t === 'multiple_choice' ? '' : 'none';
+  if (t === 'true_false') document.getElementById('q-answer-' + n).placeholder = 'true or false';
+}
+
+function createAssignment(e) {
+  e.preventDefault();
+  const questions = [];
+  for (let i = 1; i <= questionCount; i++) {
+    const textEl = document.getElementById('q-text-' + i);
+    if (!textEl) continue;
+    const type = document.getElementById('q-type-' + i).value;
+    const q = { question: textEl.value, type, correct_answer: document.getElementById('q-answer-' + i).value };
+    if (type === 'multiple_choice') q.options = document.getElementById('q-opts-' + i).value.split('\n').filter(o => o.trim());
+    else if (type === 'true_false') q.options = ['True', 'False'];
+    questions.push(q);
+  }
+  DB.addAssignment(currentClassId, document.getElementById('ca-title').value, document.getElementById('ca-desc').value, questions, document.getElementById('ca-due').value);
+  questionCount = 0;
+  closeModal();
+  loadAssignments(currentClassId);
+}
+
+function openAssignment(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('section-assignment').classList.remove('hidden');
+  trackPage('Assignment');
+  const assignment = DB.getAssignments().find(a => a.id === id);
+  const container = document.getElementById('assignment-content');
+
+  if (currentUser.role === 'student') {
+    const sub = DB.getSubmission(id, currentUser.id);
+    if (sub) {
+      let letter = 'F', color = 'var(--danger)';
+      if (sub.score >= 90) { letter = 'A'; color = 'var(--success)'; }
+      else if (sub.score >= 80) { letter = 'B'; color = '#8bc34a'; }
+      else if (sub.score >= 70) { letter = 'C'; color = 'var(--accent)'; }
+      else if (sub.score >= 60) { letter = 'D'; color = '#ff9800'; }
+      container.innerHTML = '<h2>' + esc(assignment.title) + '</h2>' +
+        '<p style="color:var(--text-light);margin-bottom:16px">' + esc(assignment.description) + '</p>' +
+        '<div class="score-display"><div class="score-number" style="color:' + color + '">' + sub.score + '%</div>' +
+        '<div class="score-label">Grade: ' + letter + '</div>' +
+        '<div class="points-earned ' + (sub.points >= 0 ? 'points-positive' : 'points-negative') + '">' + (sub.points >= 0 ? '+' : '') + sub.points + ' points</div></div>' +
+        '<h3 style="margin-top:16px">Your Answers</h3>' +
+        assignment.questions.map((q, i) => {
+          const correct = sub.answers[i] && sub.answers[i].toString().trim().toLowerCase() === q.correct_answer.toString().trim().toLowerCase();
+          return '<div class="question-block" style="border-left:3px solid ' + (correct ? 'var(--success)' : 'var(--danger)') + '">' +
+            '<h4>Q' + (i+1) + ': ' + esc(q.question) + '</h4>' +
+            '<p>Your answer: <strong>' + esc(sub.answers[i] || 'No answer') + '</strong></p>' +
+            '<p>Correct: <strong>' + esc(q.correct_answer) + '</strong> ' + (correct ? '✅' : '❌') + '</p></div>';
+        }).join('');
+    } else {
+      container.innerHTML = '<h2>' + esc(assignment.title) + '</h2>' +
+        '<p style="color:var(--text-light);margin-bottom:16px">' + esc(assignment.description) + '</p>' +
+        '<form onsubmit="submitAssignment(event,' + id + ')">' +
+        assignment.questions.map((q, i) => {
+          let inp = '';
+          if (q.type === 'multiple_choice' || q.type === 'true_false') {
+            const opts = q.options || ['True','False'];
+            inp = '<div class="options">' + opts.map(o => '<label><input type="radio" name="ans-' + i + '" value="' + esc(o) + '"> ' + esc(o) + '</label>').join('') + '</div>';
+          } else {
+            inp = '<input type="text" name="ans-' + i + '" placeholder="Your answer">';
+          }
+          return '<div class="question-block"><h4>Q' + (i+1) + ': ' + esc(q.question) + '</h4>' + inp + '</div>';
+        }).join('') +
+        '<button type="submit" class="btn btn-primary btn-full">Submit Assignment</button></form>';
+    }
+  } else {
+    const subs = DB.getSubmissionsForAssignment(id);
+    container.innerHTML = '<h2>' + esc(assignment.title) + '</h2>' +
+      '<p style="color:var(--text-light);margin-bottom:16px">' + esc(assignment.description) + '</p>' +
+      '<h3>Questions & Answers</h3>' +
+      assignment.questions.map((q, i) => '<div class="question-block"><h4>Q' + (i+1) + ': ' + esc(q.question) + '</h4><p>Answer: <strong>' + esc(q.correct_answer) + '</strong></p></div>').join('') +
+      '<h3 style="margin-top:20px">Submissions (' + subs.length + ')</h3>' +
+      (subs.length ? subs.map(s => {
+        let color = 'var(--danger)';
+        if (s.score >= 90) color = 'var(--success)';
+        else if (s.score >= 80) color = '#8bc34a';
+        else if (s.score >= 70) color = 'var(--accent)';
+        else if (s.score >= 60) color = '#ff9800';
+        return '<div class="student-row"><div><span class="name">' + esc(s.display_name) + '</span> <span class="grade-label">@' + esc(s.username) + '</span></div><span style="font-weight:900;color:' + color + '">' + s.score + '%</span></div>';
+      }).join('') : '<p style="color:var(--text-light)">No submissions yet.</p>');
+  }
+}
+
+function submitAssignment(e, id) {
+  e.preventDefault();
+  const assignment = DB.getAssignments().find(a => a.id === id);
+  const answers = assignment.questions.map((q, i) => {
+    if (q.type === 'multiple_choice' || q.type === 'true_false') {
+      const c = document.querySelector('input[name="ans-' + i + '"]:checked');
+      return c ? c.value : '';
+    }
+    const inp = document.querySelector('input[name="ans-' + i + '"]');
+    return inp ? inp.value : '';
+  });
+  const result = DB.submitAssignment(id, currentUser.id, answers);
+  if (result) { currentUser = DB.getUsers().find(u => u.id === currentUser.id); openAssignment(id); }
+  else alert('Already submitted!');
+}
+
+// ===== CLASS STUDENTS =====
+function loadClassStudents(classId) {
+  const students = DB.getStudentsInClass(classId);
+  const container = document.getElementById('class-students-list');
+  if (!students.length) { container.innerHTML = '<p style="color:var(--text-light)">No students yet.</p>'; return; }
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  container.innerHTML = students.map(s =>
+    '<div class="student-row">' +
+    '<div><span class="avatar-display" style="width:28px;height:28px;font-size:16px">' + (s.avatar || '😊') + '</span> ' +
+    '<span class="name">' + esc(s.display_name) + '</span> <span class="grade-label">' + s.grade + 'th · ' + s.total_points + ' pts</span></div>' +
+    '<div style="display:flex;gap:6px">' +
+    (isStaff ? '<button class="btn btn-sm btn-dark" onclick="sendCommentTo(' + s.id + ',\'' + esc(s.display_name) + '\')">Message</button>' : '') +
+    (isStaff ? '<button class="btn btn-sm btn-danger" onclick="removeStudent(' + classId + ',' + s.id + ')">Remove</button>' : '') +
+    '</div></div>'
+  ).join('');
+}
+
+function loadAvailableStudents(classId) {
+  const inClass = DB.getStudentsInClass(classId).map(s => s.id);
+  const students = DB.getUsers().filter(u => u.role === 'student' && !inClass.includes(u.id));
+  const container = document.getElementById('available-students-list');
+  if (!students.length) { container.innerHTML = '<p style="color:var(--text-light)">No students to add.</p>'; return; }
+  container.innerHTML = students.map(s =>
+    '<div class="student-row"><div><span class="name">' + esc(s.display_name) + '</span> <span class="grade-label">' + (s.grade || '') + 'th</span></div>' +
+    '<button class="btn btn-sm btn-primary" onclick="addStudentToClass(' + classId + ',' + s.id + ')">Add</button></div>'
+  ).join('');
+}
+
+function addStudentToClass(classId, studentId) { DB.addStudentToClass(classId, studentId); loadClassStudents(classId); loadAvailableStudents(classId); }
+function removeStudent(classId, studentId) { if (!confirm('Remove student?')) return; DB.removeStudentFromClass(classId, studentId); loadClassStudents(classId); }
+
+// ===== GAMES =====
+const GAMES = [
+  { id: 1, name: 'Math Playground', desc: 'Practice math skills', icon: '📐', type: 'educational', url: 'https://www.mathplayground.com/games.html' },
+  { id: 2, name: 'Typing Club', desc: 'Improve your typing speed', icon: '⌨️', type: 'educational', url: 'https://www.typingclub.com' },
+  { id: 4, name: 'Scratch', desc: 'Learn coding by making games', icon: '🐱', type: 'educational', url: 'https://scratch.mit.edu' },
+  { id: 5, name: 'Cool Math Games', desc: 'Fun math-based games', icon: '🎮', type: 'fun', url: 'https://www.coolmathgames.com' },
+  { id: 6, name: 'Prodigy Math', desc: 'Math adventure game', icon: '⚔️', type: 'educational', url: 'https://www.prodigygame.com' },
+  { id: 7, name: 'Kahoot!', desc: 'Quiz game platform', icon: '❓', type: 'educational', url: 'https://kahoot.it' },
+  { id: 8, name: 'Quizlet', desc: 'Study with flashcards', icon: '🃏', type: 'educational', url: 'https://quizlet.com' },
+];
+
+let currentGameFilter = 'all';
+
+function loadGames() {
+  document.getElementById('game-frame-area').classList.add('hidden');
+  document.getElementById('games-grid').classList.remove('hidden');
+
+  const user = DB.getUsers().find(u => u.id === currentUser.id);
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+
+  if (!isStaff) {
+    const allowed = user.games_allowed || 'pending';
+    const typeFilter = user.games_type || 'all';
+
+    if (allowed === 'pending') {
+      document.getElementById('games-locked-msg').classList.remove('hidden');
+      document.getElementById('games-grid').classList.add('hidden');
+      return;
+    }
+    document.getElementById('games-locked-msg').classList.add('hidden');
+
+    let games = GAMES;
+    if (allowed === 'educational') games = games.filter(g => g.type === 'educational');
+    else if (allowed === 'fun') games = games.filter(g => g.type === 'fun');
+    if (typeFilter !== 'all') games = games.filter(g => g.type === typeFilter);
+    if (currentGameFilter !== 'all') games = games.filter(g => g.type === currentGameFilter);
+    renderGames(games);
+  } else {
+    document.getElementById('games-locked-msg').classList.add('hidden');
+    const games = currentGameFilter === 'all' ? GAMES : GAMES.filter(g => g.type === currentGameFilter);
+    renderGames(games);
+  }
+}
+
+function renderGames(games) {
+  const grid = document.getElementById('games-grid');
+  if (!games.length) { grid.innerHTML = '<p style="color:var(--text-light)">No games available.</p>'; return; }
+  grid.innerHTML = games.map(g =>
+    '<div class="game-card" onclick="openGame(\'' + g.url + '\',\'' + esc(g.name) + '\')">' +
+    '<div class="game-icon">' + g.icon + '</div>' +
+    '<h4>' + esc(g.name) + '</h4>' +
+    '<p>' + esc(g.desc) + '</p>' +
+    '<span class="game-tag ' + g.type + '">' + g.type.toUpperCase() + '</span></div>'
+  ).join('');
+}
+
+function filterGames(type, btn) {
+  currentGameFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  loadGames();
+}
+
+function openGame(url, name) {
+  trackPage('Playing: ' + name);
+  document.getElementById('games-grid').classList.add('hidden');
+  document.getElementById('games-locked-msg').classList.add('hidden');
+  document.getElementById('game-frame-area').classList.remove('hidden');
+  document.getElementById('game-iframe').src = url;
+}
+
+function closeGame() {
+  document.getElementById('game-iframe').src = '';
+  document.getElementById('game-frame-area').classList.add('hidden');
+  loadGames();
+}
+
+// ===== GAME PERMISSIONS (Teacher/Principal) =====
+function showGameSettings(studentId, studentName) {
+  const user = DB.getUsers().find(u => u.id === studentId);
+  openModal('Game Settings for ' + studentName, `
+    <div class="form-group">
+      <label>Games Access</label>
+      <select id="gs-allowed">
+        <option value="pending" ${user.games_allowed === 'pending' ? 'selected' : ''}>Locked (must finish work)</option>
+        <option value="all" ${user.games_allowed === 'all' ? 'selected' : ''}>All Games Unlocked</option>
+        <option value="educational" ${user.games_allowed === 'educational' ? 'selected' : ''}>Educational Only</option>
+        <option value="fun" ${user.games_allowed === 'fun' ? 'selected' : ''}>Fun Only</option>
+        <option value="none" ${user.games_allowed === 'none' ? 'selected' : ''}>No Games</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveGameSettings(${studentId})">Save</button>
+  `);
+}
+
+function saveGameSettings(studentId) {
+  DB.updateUser(studentId, { games_allowed: document.getElementById('gs-allowed').value });
+  closeModal();
+}
+
+// ===== MEETINGS =====
+function loadMeetings() {
+  const meetings = DB.getMeetings();
+  const users = DB.getUsers();
+  const container = document.getElementById('meetings-list');
+
+  const active = meetings.filter(m => m.active);
+  const past = meetings.filter(m => !m.active);
+
+  let html = '';
+  if (active.length) {
+    html += '<h3 style="margin-bottom:10px">🟢 Live Now</h3>';
+    html += active.map(m => {
+      const host = users.find(u => u.id === m.host_id);
+      const isHost = m.host_id === currentUser.id || ['principal','counselor'].includes(currentUser.role);
+      return '<div class="meeting-card live">' +
+        '<div><div class="meeting-title"><span class="live-dot"></span>' + esc(m.title) + '</div>' +
+        '<div class="meeting-info">' + (m.type === 'video' ? '📹 Video' : '🎙️ Audio') + ' · Host: ' + esc(host ? host.display_name : 'Unknown') + '</div></div>' +
+        '<div style="display:flex;gap:8px">' +
+        '<a href="' + esc(m.link) + '" target="_blank" class="btn btn-primary btn-sm">Join</a>' +
+        (isHost ? '<button class="btn btn-sm btn-danger" onclick="endMeeting(' + m.id + ')">End</button>' : '') +
+        '</div></div>';
+    }).join('');
+  }
+
+  if (past.length) {
+    html += '<h3 style="margin:16px 0 10px">Past Meetings</h3>';
+    html += past.slice(-5).reverse().map(m => {
+      const host = users.find(u => u.id === m.host_id);
+      return '<div class="meeting-card"><div><div class="meeting-title">' + esc(m.title) + '</div>' +
+        '<div class="meeting-info">' + (m.type === 'video' ? '📹 Video' : '🎙️ Audio') + ' · Host: ' + esc(host ? host.display_name : 'Unknown') + ' · Ended</div></div></div>';
+    }).join('');
+  }
+
+  if (!active.length && !past.length) html = '<p style="color:var(--text-light)">No meetings yet.</p>';
+  container.innerHTML = html;
+}
+
+function showCreateMeeting() {
+  openModal('Host a Meeting', `
+    <form onsubmit="createMeeting(event)">
+      <div class="form-group"><label>Meeting Title</label><input type="text" id="mt-title" required placeholder="e.g. Math Review Session"></div>
+      <div class="form-group"><label>Type</label>
+        <select id="mt-type">
+          <option value="video">📹 Video Meeting</option>
+          <option value="audio">🎙️ Audio Only</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Meeting Link (Google Meet, Zoom, etc.)</label>
+        <input type="url" id="mt-link" required placeholder="https://meet.google.com/...">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Start Meeting</button>
+    </form>
+  `);
+}
+
+function createMeeting(e) {
+  e.preventDefault();
+  DB.addMeeting(document.getElementById('mt-title').value, document.getElementById('mt-type').value, currentUser.id, document.getElementById('mt-link').value);
+  closeModal();
+  loadMeetings();
+}
+
+function endMeeting(id) {
+  if (!confirm('End this meeting?')) return;
+  DB.endMeeting(id);
+  loadMeetings();
+}
+
+// ===== LEADERBOARD =====
+function loadLeaderboard(grade, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let students = DB.getUsers().filter(u => u.role === 'student');
+  if (grade) students = students.filter(u => u.grade === parseInt(grade));
+  students.sort((a, b) => b.total_points - a.total_points);
+  const container = document.getElementById('leaderboard-list');
+  if (!students.length) { container.innerHTML = '<p style="color:var(--text-light)">No students yet.</p>'; return; }
+  container.innerHTML = students.map((s, i) =>
+    '<div class="lb-row">' +
+    '<div class="lb-rank">#' + (i+1) + '</div>' +
+    '<div style="font-size:22px">' + (s.avatar || '😊') + '</div>' +
+    '<div class="lb-info"><div class="lb-name">' + esc(s.display_name) + '</div><div class="lb-grade">' + s.grade + 'th Grade</div></div>' +
+    '<div class="lb-points">' + s.total_points + ' pts</div></div>'
+  ).join('');
+}
+
+// ===== COMMENTS =====
+function startPolling() {
+  if (commentInterval) clearInterval(commentInterval);
+  commentInterval = setInterval(checkComments, 3000);
+  if (activityInterval) clearInterval(activityInterval);
+  activityInterval = setInterval(() => { if (currentUser) DB.updateActivity(currentUser.id, document.title); }, 10000);
+}
+
+function checkComments() {
+  const unseen = DB.getUnseenComments(currentUser.id);
+  const badge = document.getElementById('msg-badge');
+  if (unseen.length > 0) {
+    badge.textContent = unseen.length;
+    badge.classList.remove('hidden');
+    if (document.getElementById('popup-overlay').classList.contains('hidden')) showPopup(unseen[0]);
+  } else { badge.classList.add('hidden'); }
+}
+
+function showPopup(comment) {
+  document.getElementById('popup-from').textContent = comment.from_name;
+  document.getElementById('popup-message').textContent = comment.message;
+  document.getElementById('popup-overlay').classList.remove('hidden');
+  DB.markSeen(comment.id);
+}
+
+function dismissPopup() { document.getElementById('popup-overlay').classList.add('hidden'); checkComments(); }
+
+function loadComments() {
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  if (isStaff) {
+    const students = DB.getUsers().filter(u => u.role === 'student');
+    document.getElementById('comment-to').innerHTML = '<option value="">Select Student</option>' +
+      students.map(s => '<option value="' + s.id + '">' + esc(s.display_name) + ' (' + s.grade + 'th)</option>').join('');
+  }
+  const comments = DB.getCommentsFor(currentUser.id);
+  const container = document.getElementById('comments-list');
+  if (!comments.length) { container.innerHTML = '<p style="color:var(--text-light)">No messages yet.</p>'; return; }
+  container.innerHTML = comments.map(c =>
+    '<div class="comment-card ' + (c.seen ? '' : 'unseen') + '">' +
+    '<div class="from">From: ' + esc(c.from_name) + '</div>' +
+    '<div class="msg">' + esc(c.message) + '</div>' +
+    '<div class="time">' + new Date(c.created_at).toLocaleString() + '</div></div>'
+  ).join('');
+}
+
+function sendComment() {
+  const toId = parseInt(document.getElementById('comment-to').value);
+  const msg = document.getElementById('comment-msg').value;
+  if (!toId || !msg) return alert('Select a student and type a message');
+  DB.addComment(currentUser.id, toId, msg);
+  document.getElementById('comment-msg').value = '';
+  alert('Message sent!');
+}
+
+function sendCommentTo(studentId, name) {
+  showSection('comments');
+  setTimeout(() => {
+    document.getElementById('comment-to').value = studentId;
+    document.getElementById('comment-msg').focus();
+  }, 100);
+}
+
+// ===== USERS =====
+function loadUsers() {
+  const users = DB.getUsers();
+  const isStaff = ['teacher','principal','counselor'].includes(currentUser.role);
+  const isPrincipal = currentUser.role === 'principal';
+  const container = document.getElementById('users-list');
+  const roleBgs = { principal: '#f5c400', counselor: '#333', teacher: '#444', student: '#222' };
+  const roleColors = { principal: '#000', counselor: '#f5c400', teacher: '#f5c400', student: '#f5c400' };
+
+  container.innerHTML = '<table class="users-table"><thead><tr><th>Avatar</th><th>Name</th><th>Username</th><th>Role</th><th>Grade</th><th>Points</th>' +
+    (isStaff ? '<th>Actions</th>' : '') + '</tr></thead><tbody>' +
+    users.map(u =>
+      '<tr><td style="font-size:20px">' + (u.avatar || '😊') + '</td>' +
+      '<td>' + esc(u.display_name) + '</td><td>' + esc(u.username) + '</td>' +
+      '<td><span style="padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:' + (roleBgs[u.role]||'#333') + ';color:' + (roleColors[u.role]||'#fff') + '">' + u.role.toUpperCase() + '</span></td>' +
+      '<td>' + (u.grade ? u.grade + 'th' : '-') + '</td>' +
+      '<td>' + (u.total_points || 0) + '</td>' +
+      (isStaff ? '<td style="display:flex;gap:6px;flex-wrap:wrap">' +
+        (u.role === 'student' ? '<button class="btn btn-sm btn-dark" onclick="showGameSettings(' + u.id + ',\'' + esc(u.display_name) + '\')">🎮 Games</button> <button class="btn btn-sm btn-dark" onclick="promoteStudent(' + u.id + ')">⬆️ Grade</button> ' : '') +
+        (isPrincipal && u.id !== currentUser.id ? '<button class="btn btn-sm btn-danger" onclick="deleteAccount(' + u.id + ',\'' + esc(u.display_name) + '\')">🗑️ Delete</button>' : '') +
+        '</td>' : '') +
+      '</tr>'
+    ).join('') + '</tbody></table>';
+}
+
+// ===== GRADE PROMOTION =====
+function promoteStudent(studentId) {
+  const user = DB.getUsers().find(u => u.id === studentId);
+  if (!user) return;
+  const currentGrade = user.grade || 6;
+  if (currentGrade >= 8) { alert(user.display_name + ' is already in 8th grade (max).'); return; }
+  const newGrade = currentGrade + 1;
+  if (!confirm('Promote ' + user.display_name + ' from ' + currentGrade + 'th to ' + newGrade + 'th grade?')) return;
+  DB.updateUser(studentId, { grade: newGrade });
+  alert(user.display_name + ' has been promoted to ' + newGrade + 'th grade!');
+  loadUsers();
+}
+
+// ===== DELETE ACCOUNT =====
+function deleteAccount(userId, displayName) {
+  if (!confirm('Delete account for "' + displayName + '"?\n\nThis will also remove them from all classes and delete their submissions. This cannot be undone.')) return;
+  DB.deleteUser(userId);
+  loadUsers();
+}
+
+// ===== MONITOR =====
+function loadMonitor() {
+  const activity = DB.getStudentActivity();
+  const container = document.getElementById('monitor-grid');
+  if (!activity.length) { container.innerHTML = '<p style="color:var(--text-light)">No students registered yet.</p>'; return; }
+
+  const now = Date.now();
+  container.innerHTML = activity.map(s => {
+    const lastSeen = s.last_seen ? new Date(s.last_seen) : null;
+    const isOnline = lastSeen && (now - lastSeen.getTime()) < 30000;
+    return '<div class="monitor-card">' +
+      '<div class="monitor-name">' +
+      '<span class="' + (isOnline ? 'online-dot' : 'offline-dot') + '"></span>' +
+      '<span style="font-size:18px">' + (s.avatar || '😊') + '</span>' +
+      esc(s.display_name) + '</div>' +
+      '<div class="monitor-page">' + esc(s.current_page || 'Not online') + '</div>' +
+      '<div class="monitor-time">' + (lastSeen ? 'Last seen: ' + lastSeen.toLocaleTimeString() : 'Never visited') + '</div></div>';
+  }).join('');
+}
+
+// ===== MODAL =====
+function openModal(title, bodyHtml) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); questionCount = 0; }
+
+// ===== HELPERS =====
+function esc(str) {
+  if (!str && str !== 0) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ===== INIT =====
+checkAuth();
+
+</script>
+</body>
+</html>
